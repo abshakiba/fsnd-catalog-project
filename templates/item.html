@@ -49,7 +49,9 @@
           <h2>{{"Item Not found"}}</h2>
           {% endif%}
         </div>
+        <a class="btn btn-sm btn-outline-primary" href="{{url_for('editItem', item_id = item.id, catalog_id=item.catalog_id)}}">Edit {{item.name}}</a>
       </div>
+
 
 
       <hr>

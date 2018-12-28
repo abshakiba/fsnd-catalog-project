@@ -47,7 +47,7 @@ def showItem(catalog_id):
 @app.route('/catalog/<int:catalog_id>/item/<int:item_id>')
 def menuItemDesc(catalog_id, item_id):
     try:
-        item = session.query(Item).filter_by(id=item_id, catalog_id=catalog_id).one()
+        item = session.query(Item).filter_by(id=item_id).one()
         return render_template('item.html', item=item)
     except:
         flash("Oops! Invalid Item Name!")
@@ -75,34 +75,29 @@ def newCatalog():
     else:
         return render_template('newCatalog.html')
 
-@app.route('/catalog/<catalog_name>/edit/', methods=['GET', 'POST'])
-def editCatalog(catalog_name):
+@app.route('/catalog/<int:catalog_id>/edit/', methods=['GET', 'POST'])
+def editCatalog(catalog_id):
     # if 'username' not in login_session:
     #     return redirect('/login')
+
+    editCatalog = session.query(Catalog).filter_by(id=catalog_id).one()
+    # if editCatalog.user_id != login_session['user_id']:
+    #     return "<script>function myFunction() {alert('You are not authorized to edit this category.');}</script><body onload='myFunction()''>"
     if request.method == 'POST':
-        newCatalog = Catalog(name=request.form['name'], user_id=1)
-        session.add(newCatalog)
-        try:
-            session.commit()
-            flash('New Catalog %s Successfully Created' % newCatalog.name)
-            return redirect(url_for('showCatalog'))
-        except Exception as err:
-            session.rollback()
-            if "UNIQUE constraint failed" in str(err):
-                flash("Oops! Catalog Name Already Exists!")
-            else:
-                flash("Oops! Something Went Wrong! Try Again!")
+        if request.form['name']:
+            editCatalog.name = request.form['name']
+            flash('Catalog Successfully Edited %s' % editCatalog.name)
             return redirect(url_for('showCatalog'))
     else:
-        catalog = session.query(Catalog).filter_by(name=catalog_name).one()
-        return render_template('editCatalog.html', catalog=catalog)
+
+        return render_template('editCatalog.html', catalog=editCatalog)
 
 @app.route('/catalog/items/new/', methods=['GET', 'POST'])
 def newItem():
     # if 'username' not in login_session:
     #     return redirect('/login')
     if request.method == 'POST':
-        newItem = Item(name=request.form['name'],catalog_id=request.form['catalog_id'], user_id=1)
+        newItem = Item(name=request.form['name'],description=request.form['description'] ,catalog_id=request.form['catalog_id'], user_id=1)
         session.add(newItem)
         try:
             session.commit()
@@ -119,6 +114,25 @@ def newItem():
     else:
         catalogs = session.query(Catalog).order_by(asc(Catalog.name))
         return render_template('newItem.html', catalogs=catalogs)
+
+@app.route('/catalog/<int:catalog_id>/item/<int:item_id>/edit', methods=['GET', 'POST'])
+def editItem(catalog_id, item_id):
+    # if 'username' not in login_session:
+    #     return redirect('/login')
+    catalogs = session.query(Catalog).order_by(asc(Catalog.name))
+    editItem = session.query(Item).filter_by(id=item_id, catalog_id=catalog_id).one()
+    # if editCatalog.user_id != login_session['user_id']:
+    #     return "<script>function myFunction() {alert('You are not authorized to edit this category.');}</script><body onload='myFunction()''>"
+    if request.method == 'POST':
+        if request.form['name'] and request.form['catalog_id']:
+            editItem.name = request.form['name']
+            editItem.description = request.form['description']
+            editItem.catalog_id = request.form['catalog_id']
+            flash('Item Successfully Edited %s' % editItem.name)
+            return redirect(url_for('showCatalog'))
+    else:
+
+        return render_template('editItem.html', item=editItem, catalogs=catalogs)
 
 
 if __name__ == '__main__':
