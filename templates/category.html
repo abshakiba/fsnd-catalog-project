@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='app.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+	</head>
+	<body style="padding-top: 65px;">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="#">Catalog App</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+          </li>
+        </ul>
+        <div class="col-4 d-flex justify-content-end align-items-center">
+          <a class="btn btn-sm btn-outline-light" href="#">Login</a>
+        </div>
+      </div>
+    </nav>
+<br>
+    <div class="container">
+      <!-- Example row of columns -->
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="row">
+          <div class="col-md-12 flash">
+            <ul>
+              {% for message in messages %}
+                <li> <strong> {{ message }} </strong> </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+    {% endwith %}
+
+      <div class="row">
+        <div class="col-md-4">
+          <h2>Categories</h2>
+            {% for catalog in catalogs %}
+              <a href = "{{url_for('showItem', catalog_name = catalog.name)}}">{{catalog.name}}</a><br>
+            {% endfor %}
+        </div>
+        <div class="col-md-8">
+
+          {% if items !=[]%}
+            <h2>{{catalog_name}} Items ({{items.count()}} Items)</h2>
+            {% for item in items %}
+              <a href = "{{url_for('menuItemDesc', catalog_name = item.catalog_name, item_name=item.name)}}">{{item.name}}</a>({{item.catalog_name}})<br>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <hr>
+
+    </div> <!-- /container -->
+
+
+	</body>
+</html>
