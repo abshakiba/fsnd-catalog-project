@@ -7,7 +7,7 @@
 	</head>
 	<body style="padding-top: 65px;">
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="#">Catalog App</a>
+      <a class="navbar-brand" href="{{url_for('showCatalog')}}">Catalog App</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -44,17 +44,25 @@
         <div class="col-md-4">
           <h2>Categories</h2>
             {% for catalog in catalogs %}
-              <a href = "{{url_for('showItem', catalog_name = catalog.name)}}">{{catalog.name}}</a><br>
+              <a href = "{{url_for('showItem', catalog_id = catalog.id)}}">{{catalog.name}}</a><br>
             {% endfor %}
+            <br>
+            <div class="d-flex align-items-center">
+              <a class="btn btn-sm btn-outline-primary" href="{{url_for('newCatalog')}}">Add Catalog</a>
+            </div>
         </div>
         <div class="col-md-8">
 
           {% if items !=[]%}
-            <h2>{{catalog_name}} Items ({{items.count()}} Items)</h2>
+            <h2>{{catalog.name}} Items ({{items.count()}} Items)</h2>
             {% for item in items %}
-              <a href = "{{url_for('menuItemDesc', catalog_name = item.catalog_name, item_name=item.name)}}">{{item.name}}</a>({{item.catalog_name}})<br>
+              <a href = "{{url_for('menuItemDesc', catalog_id = item.catalog_id, item_id=item.id)}}">{{item.name}}</a><br>
             {% endfor %}
           {% endif %}
+          <br>
+          <div class="d-flex align-items-center">
+            <a class="btn btn-sm btn-outline-primary" href="{{url_for('newItem')}}">Add Item</a>
+          </div>
         </div>
       </div>
 

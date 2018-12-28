@@ -19,8 +19,8 @@ class User(Base):
 class Catalog(Base):
     __tablename__ = 'catalog'
 
-    id = Column(Integer)
-    name = Column(String(250), primary_key=True)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), unique=True, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
@@ -40,7 +40,7 @@ class Item(Base):
     id = Column(Integer, primary_key=True)
     description = Column(String(400))
     created_date = Column(DateTime, default=datetime.datetime.utcnow)
-    catalog_name = Column(Integer, ForeignKey('catalog.name'))
+    catalog_id = Column(Integer, ForeignKey('catalog.id'))
     catalog = relationship(Catalog)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)

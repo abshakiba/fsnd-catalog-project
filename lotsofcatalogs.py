@@ -31,28 +31,28 @@ session.add(catalog1)
 session.commit()
 
 item1 = Item(user_id=1, name="Two shinguards", description="A shin guard or shin pad is a piece of equipment worn on the front of a player’s shin to protect them from injury.",
-                catalog_name=catalog1.name)
+                catalog_id=catalog1.id)
 
 session.add(item1)
 session.commit()
 
 
 item2 = Item(user_id=1, name="Shinguards", description="The shin guard was inspired by the concept of a greave. A greave is a piece of armor used to protect the shin.",
-                catalog_name=catalog1.name)
+                catalog_id=catalog1.id)
 
 session.add(item2)
 session.commit()
 
 
 item3 = Item(user_id=1, name="Jersey", description="The Jersey official football team represents the British Crown Dependency of Jersey in non-FIFA International matches.",
-                catalog_name=catalog1.name)
+                catalog_id=catalog1.id)
 
 session.add(item3)
 session.commit()
 
 
 item4 = Item(user_id=1, name="Soccer Cleats", description="Football shoes have studs on their soles Cleats or studs are protrusions on the sole of a shoe, or on an external attachment to a shoe, that provide additional traction on a soft or slippery surface.",
-                catalog_name=catalog1.name)
+                catalog_id=catalog1.id)
 
 session.add(item4)
 session.commit()
@@ -72,7 +72,7 @@ session.add(catalog3)
 session.commit()
 
 item5 = Item(user_id=1, name="Bat", description="A baseball bat is a smooth wooden or metal club used in the sport of baseball to hit the ball after it is thrown by the pitcher.",
-                catalog_name=catalog3.name)
+                catalog_id=catalog3.id)
 
 session.add(item5)
 session.commit()
@@ -85,7 +85,7 @@ session.add(catalog4)
 session.commit()
 
 item6 = Item(user_id=1, name="Frisbee", description="A frisbee, also called a flying disc, is a gliding toy or sporting item that is generally plastic and roughly 20 to 25 centimetres in diameter with a pronounced lip.",
-                catalog_name=catalog4.name)
+                catalog_id=catalog4.id)
 
 session.add(item6)
 session.commit()
@@ -98,13 +98,13 @@ session.add(catalog5)
 session.commit()
 
 item7 = Item(user_id=1, name="Goggles", description="Goggles, or safety glasses, are forms of protective eyewear that usually enclose or protect the area surrounding the eye in order to prevent particulates, water or chemicals from striking the eyes.",
-                catalog_name=catalog5.name)
+                catalog_id=catalog5.id)
 
 session.add(item7)
 session.commit()
 
 item8 = Item(user_id=1, name="Snowboard", description="Snowboards are boards where both feet are secured to the same board, which are wider than skis, with the ability to glide on snow.",
-                catalog_name=catalog5.name)
+                catalog_id=catalog5.id)
 
 session.add(item8)
 session.commit()
@@ -138,7 +138,7 @@ session.add(catalog9)
 session.commit()
 
 item9 = Item(user_id=1, name="Stick", description="An ice hockey stick is a piece of equipment used in ice hockey to shoot, pass, and carry the puck across the ice.",
-                catalog_name=catalog9.name)
+                catalog_id=catalog9.id)
 
 session.add(item9)
 session.commit()
