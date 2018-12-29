@@ -2,9 +2,9 @@
 
 ## How to run?
 
-* Make sure you have all required packages install in your machine. This application is working on port `6789`. Make sure no other application in listening on this port.
+* Make sure you have all required packages installed in your machine. This application is working on port `6789`. Make sure no other applications is listening on this port.
 
-* Setup the database and tables: `python database_setup`
+* Setup the database and tables: `python database_setup.py`
 
 * Optional: Fill dummy records to the database: `python lotsofcatalogs.py`
 
