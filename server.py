@@ -342,6 +342,29 @@ def deleteItem(item_id, catalog_id):
 
         return render_template('deleteItem.html', item=deleteItem, username = login_session['username'])
 
+@app.route('/catalog/JSON')
+def allCatalogsJSON():
+    catalogs = session.query(Catalog)
+    q = session.query(Catalog,Item).join(Item, Item.catalog_id == Catalog.id).all()
+    return jsonify(Catalogs=[i.serialize for i in catalogs])
+
+@app.route('/catalog/<int:catalog_id>/item/JSON')
+def ItemsCatalogJSON(catalog_id):
+    items = session.query(Item).filter_by(catalog_id=catalog_id).order_by(Item.created_date.desc())
+    return jsonify(Items=[i.serialize for i in items])
+
+@app.route('/catalog/item/JSON')
+def allItemsJSON():
+    items = session.query(Item).order_by(Item.created_date.desc())
+    return jsonify(Items=[i.serialize for i in items])
+
+@app.route('/catalog/<int:catalog_id>/item/<int:item_id>/JSON')
+def itemJSON(item_id,catalog_id):
+    item = session.query(Item).filter_by(id=item_id)
+    return jsonify(Item=[i.serialize for i in item])
+
+
+
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
