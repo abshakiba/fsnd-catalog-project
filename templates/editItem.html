@@ -18,7 +18,8 @@
           </li>
         </ul>
         <div class="col-4 d-flex justify-content-end align-items-center">
-          <a class="btn btn-sm btn-outline-light" href="#">Login</a>
+					<snap class="navbar-brand">{{username}}</snap>
+          <a class="btn btn-sm btn-outline-light" href="{{url_for('gdisconnect')}}">Log out</a>
         </div>
       </div>
     </nav>

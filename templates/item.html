@@ -17,9 +17,14 @@
           <li class="nav-item active">
           </li>
         </ul>
+        {% if username %}
         <div class="col-4 d-flex justify-content-end align-items-center">
-          <a class="btn btn-sm btn-outline-light" href="#">Login</a>
+          <snap class="navbar-brand">{{username}}</snap>
+          <a class="btn btn-sm btn-outline-light" href="{{url_for('gdisconnect')}}">Log out</a>
+        {% else %}
+          <a class="btn btn-sm btn-outline-light" href="{{url_for('showLogin')}}">Login</a>
         </div>
+        {%endif %}
       </div>
     </nav>
 <br>
@@ -49,8 +54,10 @@
           <h2>{{"Item Not found"}}</h2>
           {% endif%}
         </div>
-        <a class="btn btn-sm btn-outline-warning" href="{{url_for('editItem', item_id = item.id, catalog_id=item.catalog_id)}}">Edit {{item.name}}</a>
-        <a class="btn btn-sm btn-outline-danger" href="{{url_for('deleteItem', item_id = item.id, catalog_id=item.catalog_id)}}">Delete {{item.name}}</a>
+        {% if item.user_id == userid%}
+          <a class="btn btn-sm btn-outline-warning" href="{{url_for('editItem', item_id = item.id, catalog_id=item.catalog_id)}}">Edit {{item.name}}</a>
+          <a class="btn btn-sm btn-outline-danger" href="{{url_for('deleteItem', item_id = item.id, catalog_id=item.catalog_id)}}">Delete {{item.name}}</a>
+        {% endif %}
       </div>
 
 

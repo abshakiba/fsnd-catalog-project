@@ -17,9 +17,14 @@
           <li class="nav-item active">
           </li>
         </ul>
+        {% if username %}
         <div class="col-4 d-flex justify-content-end align-items-center">
-          <a class="btn btn-sm btn-outline-light" href="#">Login</a>
+          <snap class="navbar-brand">{{username}}</snap>
+          <a class="btn btn-sm btn-outline-light" href="{{url_for('gdisconnect')}}">Log out</a>
+        {% else %}
+          <a class="btn btn-sm btn-outline-light" href="{{url_for('showLogin')}}">Login</a>
         </div>
+        {%endif %}
       </div>
     </nav>
 <br>
