@@ -57,7 +57,7 @@
                 <label for="user_id">User</label>
                 <input type="text" class="form-control" id="user_id" name="user_id" placeholder="" value="{{userid}}" required disabled>
                 <div class="invalid-feedback">
-                  Valid last name is required.
+                  Valid User ID is required.
                 </div>
               </div>
             </div>
@@ -65,12 +65,15 @@
 						  <div class="input-group-prepend">
 						    <label class="input-group-text" for="catalog_id">Categories</label>
 						  </div>
-						  <select class="custom-select" id="catalog_id" name="catalog_id">
-						    <option selected>Choose...</option>
+						  <select required class="custom-select" id="catalog_id" name="catalog_id" >
+						    <option selected value=''>Choose...</option>
 								{% for catalog in catalogs %}
 						    	<option value="{{catalog.id}}">{{catalog.name}}</option>
 								{% endfor %}
 						  </select>
+							<div class="invalid-feedback">
+								Valid Category is required.
+							</div>
 						</div>
 						<div class="form-group">
 							<label for="description">Description</label>
