@@ -28,8 +28,9 @@ class Catalog(Base):
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
-            'name': self.name,
             'id': self.id,
+            'name': self.name,
+            'user_id': self.user_id
         }
 
 
@@ -41,7 +42,7 @@ class Item(Base):
     description = Column(String(400))
     created_date = Column(DateTime, default=datetime.datetime.utcnow)
     catalog_id = Column(Integer, ForeignKey('catalog.id'))
-    catalog = relationship(Catalog)
+    catalog = relationship(Catalog, cascade='delete')
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
@@ -50,8 +51,11 @@ class Item(Base):
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
+            'id': self.id,
             'name': self.name,
             'description': self.description,
+            'catalog': self.catalog,
+            'created_date': seld.created_date
         }
 
 
