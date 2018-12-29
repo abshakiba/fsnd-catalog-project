@@ -47,7 +47,7 @@ def showItem(catalog_id):
 @app.route('/catalog/<int:catalog_id>/item/<int:item_id>')
 def menuItemDesc(catalog_id, item_id):
     try:
-        item = session.query(Item).filter_by(id=item_id).one()
+        item = session.query(Item).filter_by(id=item_id, catalog_id=catalog_id).one()
         return render_template('item.html', item=item)
     except:
         flash("Oops! Invalid Item Name!")
@@ -92,6 +92,32 @@ def editCatalog(catalog_id):
 
         return render_template('editCatalog.html', catalog=editCatalog)
 
+@app.route('/catalog/<int:catalog_id>/delete/', methods=['GET', 'POST'])
+def deleteCatalog(catalog_id):
+    # if 'username' not in login_session:
+    #     return redirect('/login')
+
+    deleteCatalog = session.query(Catalog).filter_by(id=catalog_id).one()
+    # if editCatalog.user_id != login_session['user_id']:
+    #     return "<script>function myFunction() {alert('You are not authorized to edit this category.');}</script><body onload='myFunction()''>"
+    if request.method == 'POST':
+        if request.form['delete_catalog']:
+            if request.form['delete_catalog'] == "1":
+                if session.query(Item).filter_by(catalog_id=catalog_id).count() == 0:
+                    session.delete(deleteCatalog)
+                    flash('%s Successfully Deleted' % deleteCatalog.name)
+                    session.commit()
+                    return redirect(url_for('showCatalog'))
+                else:
+                    flash('You cannot delete %s. Remove %s Items First!' % (deleteCatalog.name, deleteCatalog.name))
+                    return redirect(url_for('showCatalog'))
+            else:
+                return redirect(url_for('showCatalog'))
+    else:
+
+        return render_template('deleteCatalog.html', catalog=deleteCatalog)
+
+
 @app.route('/catalog/items/new/', methods=['GET', 'POST'])
 def newItem():
     # if 'username' not in login_session:
@@ -134,6 +160,26 @@ def editItem(catalog_id, item_id):
 
         return render_template('editItem.html', item=editItem, catalogs=catalogs)
 
+@app.route('/catalog/<int:catalog_id>/item/<int:item_id>/delete/', methods=['GET', 'POST'])
+def deleteItem(item_id, catalog_id):
+    # if 'username' not in login_session:
+    #     return redirect('/login')
+
+    deleteItem = session.query(Item).filter_by(id=item_id).one()
+    # if editCatalog.user_id != login_session['user_id']:
+    #     return "<script>function myFunction() {alert('You are not authorized to edit this category.');}</script><body onload='myFunction()''>"
+    if request.method == 'POST':
+        if request.form['delete_item']:
+            if request.form['delete_item'] == "1":
+                session.delete(deleteItem)
+                flash('Item %s Successfully Deleted' % deleteItem.name)
+                session.commit()
+                return redirect(url_for('showCatalog'))
+            else:
+                return redirect(url_for('showCatalog'))
+    else:
+
+        return render_template('deleteItem.html', item=deleteItem)
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'

@@ -49,7 +49,8 @@
             <br>
             <div class="d-flex align-items-center">
               <a class="btn btn-sm btn-outline-primary" href="{{url_for('newCatalog')}}">Add Catalog</a>
-              <a class="btn btn-sm btn-outline-primary" href="{{url_for('editCatalog', catalog_id = catalog.id)}}">Edit {{catalog.name}}</a>
+              <a class="btn btn-sm btn-outline-warning" href="{{url_for('editCatalog', catalog_id = catalog.id)}}">Edit {{catalog.name}}</a>
+              <a class="btn btn-sm btn-outline-danger" href="{{url_for('deleteCatalog', catalog_id = catalog.id)}}">Delete {{catalog.name}}</a>
             </div>
         </div>
         <div class="col-md-8">
