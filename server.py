@@ -1,5 +1,10 @@
-from flask import Flask, render_template, request, redirect
-from flask import jsonify, url_for, flash
+from flask import (Flask,
+                   render_template,
+                   request,
+                   redirect,
+                   jsonify,
+                   url_for,
+                   flash)
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Catalog, Item
@@ -26,17 +31,17 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-# Login route
-
 
 @app.route('/login')
 def showLogin():
+    """ Directs Users to login page. Additionally,
+        a random token is created to avouid CRSF attck.
+     """
     state = ''.join(
         random.choice(
             string.ascii_uppercase +
             string.digits) for x in range(32))
     login_session['state'] = state
-    # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
 
 # Google API Client Connetion
@@ -44,6 +49,21 @@ def showLogin():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    """ Function to connect to Google Email APIs to authenticate
+        users. Users need to be logged in to apply any modifications.
+
+        If the communication with Google APIs is successful, application
+        will obtain username, email address, and picture of the user. All
+        will be saved in the database. Additionally, all this info will
+        saved in to the login_session so the user will have access to apply
+        modifications.
+
+        A new record will be saved in to the database for the first time users.
+        otherwise, the user's data will be retrieved from database and will
+        assigned to login_session.
+
+        Thee user will be redirected to main page if login is successful.
+    """
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid State token'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -108,6 +128,11 @@ def gconnect():
 
 
 def createUser(login_session):
+    """ A new record will be created in to the USER table in the database.
+        Args : Login session
+
+        Return: User id of new user
+    """
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
     session.add(newUser)
@@ -117,11 +142,24 @@ def createUser(login_session):
 
 
 def getUserInfo(user_id):
+    """ Return a USER record
+        Args: User id
+
+        Return: A User record from USER table. class
+    """
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
 
 def getUserId(email):
+    """ Return a USER id
+        Args: An email address
+
+        Return: IF User in the database:
+                    A User record from USER table. class
+                otherwise:
+                    None
+    """
     try:
         user = session.query(User).filter_by(email=email).one()
         return user.id
@@ -134,7 +172,10 @@ def getUserId(email):
 
 @app.route('/gdisconnect')
 def gdisconnect():
-        # Only disconnect a connected user.
+    """ Revoke the token and delete user attributes in login_session.
+        By removing info from login_session, the user will no longer has
+        access to CUD functionality.
+    """
     access_token = login_session.get('access_token')
     if access_token is None:
         response = make_response(
@@ -160,14 +201,19 @@ def gdisconnect():
         # For whatever reason, the given token was invalid.
         response = make_response(
             json.dumps('Failed to revoke token for given user.', 400))
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        flash("Failed to revoke token for given user.")
+        return redirect(url_for('showCatalog'))
 
 
 # Home Page
 @app.route('/')
 @app.route('/catalog/')
 def showCatalog():
+    """ Shows all catalog and items in the application. Everyone has access
+        to this page. If a user is logged in, their usernames will be passed to
+        show the name and log out button.
+    """
+
     catalogs = session.query(Catalog).order_by(asc(Catalog.name))
     items = session.query(Item).order_by(Item.created_date.desc())
     if 'username' in login_session:
@@ -183,6 +229,16 @@ def showCatalog():
 @app.route('/catalog/<int:catalog_id>/')
 @app.route('/catalog/<int:catalog_id>/items')
 def showItem(catalog_id):
+    """ Shows all items under a particular catalog. Additionally, all Catalogs
+        will be shown. If user has created the catalog, additional buttons
+        will be shown in the page to edit and delete the catalogself.
+
+        Args: Catalog_id
+
+        Return: Valid catalog_id : Redirects to category.html
+                                    with or without user information.
+                Invalid catalog_id: Redirects to main page with a message.
+    """
     try:
         catalog = session.query(Catalog).filter_by(id=catalog_id).one()
         items = session.query(Item).filter_by(catalog_id=catalog_id)
@@ -211,6 +267,17 @@ def showItem(catalog_id):
 
 @app.route('/catalog/<int:catalog_id>/item/<int:item_id>')
 def menuItemDesc(catalog_id, item_id):
+    """ Shows details about a particular item, if item id and catalog id
+        match with a record in the database. IF the logged in user has
+        created the item, options will be available for them to modify the
+        item.
+
+        Args: catalog_id, item_id
+
+        Return: Valid catalog_id and item_id : Redirects to item.html
+                                    with or without user information.
+                Invalid args: Redirects to main page with a message.
+    """
     try:
         item = session.query(Item).filter_by(
             id=item_id, catalog_id=catalog_id).one()
@@ -232,6 +299,18 @@ def menuItemDesc(catalog_id, item_id):
 
 @app.route('/catalog/new/', methods=['GET', 'POST'])
 def newCatalog():
+    """ Logged in users can create a new catalog.
+        Only logged in users have access to this page.
+
+        The primary key in the CATALOG table is catalog_id, However, Catalog
+        names are unique. There will be a message for users in case
+        they added a duplicate catalog name.
+
+        Args:
+
+        Return: A new record  with different catalog name will be added to
+        the CATALOG talbe in the database.
+    """
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
@@ -258,6 +337,15 @@ def newCatalog():
 
 @app.route('/catalog/<int:catalog_id>/edit/', methods=['GET', 'POST'])
 def editCatalog(catalog_id):
+    """ Logged in users can edit a catalog.
+        Only logged in users have access to this page. Only the creator of
+        catalogs are authorized to edit catalogs.
+
+        Args: catalog_id
+
+        Return: If any records with catalog_id found, an edit on a catalog
+                record will be applied.
+    """
     if 'username' not in login_session:
         return redirect('/login')
 
@@ -280,6 +368,15 @@ def editCatalog(catalog_id):
 
 @app.route('/catalog/<int:catalog_id>/delete/', methods=['GET', 'POST'])
 def deleteCatalog(catalog_id):
+    """ Logged in users can delete a catalog.
+        Only logged in users have access to this page. Only the creator of
+        catalogs are authorized to delete catalogs. Users will be redirected
+        to another page for confirmation.
+
+        Args: catalog_id
+
+        Return: If any records with catalog_id found, it will be deleted.
+    """
     if 'username' not in login_session:
         return redirect('/login')
 
@@ -313,6 +410,13 @@ def deleteCatalog(catalog_id):
 
 @app.route('/catalog/items/new/', methods=['GET', 'POST'])
 def newItem():
+    """ Logged in users can create a new item.
+        Only logged in users have access to this page.
+        Users have only access to add an item to their own category.
+        Args:
+
+        Return: A new item will be added to a category.
+    """
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
@@ -352,6 +456,15 @@ def newItem():
         'GET',
         'POST'])
 def editItem(catalog_id, item_id):
+    """ Logged in users can edit an item.
+        Only logged in users have access to this page. Only the creator of
+        items are authorized to edit items.
+
+        Args: catalog_id, item_id
+
+        Return: If any records with catalog_id and item_id found, an edit on
+        an item will be applied.
+    """
     if 'username' not in login_session:
         return redirect('/login')
     catalogs = session.query(Catalog).order_by(asc(Catalog.name))
@@ -382,6 +495,16 @@ def editItem(catalog_id, item_id):
         'GET',
         'POST'])
 def deleteItem(item_id, catalog_id):
+    """ Logged in users can delete an item.
+        Only logged in users have access to this page. Only the creator of
+        items are authorized to delete items. Users will be redirected
+        to another page for confirmation.
+
+        Args: item_id, catalog_id
+
+        Return: If any records with item_id and catalog_id found, it will be
+                deleted.
+    """
     if 'username' not in login_session:
         return redirect('/login')
 
@@ -408,6 +531,9 @@ def deleteItem(item_id, catalog_id):
 
 @app.route('/catalog/JSON')
 def allCatalogsJSON():
+    """
+        Create a JSON file with all catalogs.
+    """
     catalogs = session.query(Catalog)
     q = session.query(
         Catalog, Item).join(
@@ -417,6 +543,9 @@ def allCatalogsJSON():
 
 @app.route('/catalog/<int:catalog_id>/item/JSON')
 def ItemsCatalogJSON(catalog_id):
+    """
+        Create a JSON file with all items belog to a particular catalog.
+    """
     items = session.query(Item).filter_by(
         catalog_id=catalog_id).order_by(
         Item.created_date.desc())
@@ -425,12 +554,18 @@ def ItemsCatalogJSON(catalog_id):
 
 @app.route('/catalog/item/JSON')
 def allItemsJSON():
+    """
+        Create a JSON file with all items.
+    """
     items = session.query(Item).order_by(Item.created_date.desc())
     return jsonify(Items=[i.serialize for i in items])
 
 
 @app.route('/catalog/<int:catalog_id>/item/<int:item_id>/JSON')
 def itemJSON(item_id, catalog_id):
+    """
+        Create a JSON file with information about a particular item.
+    """
     item = session.query(Item).filter_by(id=item_id)
     return jsonify(Items=[i.serialize for i in item])
 
