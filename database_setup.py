@@ -54,7 +54,7 @@ class Item(Base):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'catalog': self.catalog,
+            'catalog_id': self.catalog_id,
             'created_date': self.created_date
         }
 
